@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#中文古籍印章设计与制作工具
+#中文古籍印章设计与制作工具 V1.0
 #by shanleiguang, 2025,06
 use strict;
 use warnings;
@@ -96,7 +96,12 @@ if($ft == 1) { #方形
 }
 
 if($ft == 2) { #圆角方形
-	$fimg->Draw(primitive => 'roundRectangle', points => get_3points(0,0,$fw,$fh,$fsr,$fsr), fill => $yfcolor);
+	if($ytype == 0) {
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
+	}
+	if($ytype == 1) {
+		$fimg->Draw(primitive => 'roundRectangle', points => get_3points(0,0,$fw,$fh,$fsr,$fsr), fill => $yfcolor);
+	}
 	$fimg->Draw(primitive => 'roundRectangle', points => get_3points($flw,$flw,$fw-$flw,$fh-$flw,$fsr,$fsr), fill => $ybcolor);
 	$yimg->Composite(image => $fimg, x => ($cw-$fw)/2, y => ($ch-$fh)/2);
 }
@@ -125,11 +130,14 @@ if($opts{'t'}) {
 		$yimg->Draw(primitive => 'line', points => get_2points($lx,0,$lx,$ch), stroke => 'red', strokewidth => 1);
 		$yimg->Annotate(text => 'x:'.int($lx), font => 'Courier', pointsize => 20, x => $lx, y => 50+($ch-$fh-$flw*2-100)/2/$cols*$j, fill => 'white');
 	}
-	$yimg->Draw(primitive => 'rectangle', points => get_2points($cw/2-10, $ch-120, $cw/2+350, $ch-30), fill => 'white');
-	$yimg->Annotate(text => "Canvas size: $cw x $ch", font => 'Courier', pointsize => 20, x => $cw/2, y => $ch-100, fill => 'black');
-	$yimg->Annotate(text => "Frame  size: $fw x $fh", font => 'Courier', pointsize => 20, x => $cw/2, y => $ch-80, fill => 'black');
-	$yimg->Annotate(text => "Frame line width: $rows x $cols", font => 'Courier', pointsize => 20, x => $cw/2, y => $ch-60, fill => 'black');
-	$yimg->Annotate(text => "Characters number: $rows x $cols", font => 'Courier', pointsize => 20, x => $cw/2, y => $ch-40, fill => 'black');
+	my ($iw, $ih, $is) = (300, 80, 15);
+	my ($ix, $iy) = ($cw-$iw-20, $ch-$ih-20);
+	$yimg->Draw(primitive => 'rectangle', points => get_2points($ix, $iy, $ix+$iw, $iy+$ih), fill => 'white');
+	$yimg->Annotate(text => "Canvas size: $cw x $ch", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is, fill => 'black');
+	$yimg->Annotate(text => "Frame  size: $fw x $fh", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*2, fill => 'black');
+	$yimg->Annotate(text => "Frame line width: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*3, fill => 'black');
+	$yimg->Annotate(text => "Characters number: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*4, fill => 'black');
+	$yimg->Annotate(text => "Yinn type: $ytype", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*5, fill => 'black');
 }
 
 #打印印文文字
@@ -166,22 +174,22 @@ foreach my $cid (0..$#ychars) {
 
 if(not $opts{'t'}) {
 	if($ev == 1) { #做旧做残，增加随机大小的椭圆斑点图层
-		my $pnum = 200;
+		my $pnum = 100;
 		foreach my $i (1..$pnum) {
 	    	my ($px, $py) = (int(rand($cw)), int(rand($ch)));
-	    	my $size = 5+int(rand(20));    
+	    	my $size = 10+int(rand(10));    
 	    	my $point = Image::Magick->new();
+	    	my $pcolor = ($ytype == 0) ? $yfcolor : $ybcolor;
 
 	    	$point->Set(size => $size.'x'.$size);
 	    	$point->ReadImage('canvas:transparent');
 	    	$point->Draw(primitive => 'ellipse', 
 	        	points => get_points_ellipse($size/2, $size/2, $size*0.3, $size*0.2),
-	        	fill => 'black', 
+	        	fill => $pcolor, 
 	    	);
 	    	$point->Rotate(degrees => rand(45)-22.5);
 	    	$point->OilPaint(radius => 1.5);
 	    	$point->AdaptiveBlur(radius => 2.2, sigma => 1, bias => -1);
-	    	$point->Spread(radius => 0.01, interpolate => 'spline');
 	    	$yimg->Composite(image => $point, x => $px-$size*0.4, y => $py, compose => 'Multiply');
 		}
 	}
@@ -204,7 +212,7 @@ if(not $opts{'t'}) {
 
 my $yinfn = $cid.'_'.$ytype;
 
-$yinfn.= '_test' if($opts{'t'});
+$yinfn.= '_test' if(defined $opts{'t'});
 $yimg->Write("image/$yinfn.png");
 
 sub get_2points {
