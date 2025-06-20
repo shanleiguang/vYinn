@@ -25,7 +25,7 @@ if(not defined $opts{'n'}) {
 
 my %config;
 
-open BLANKCFG, "< blank.cfg";
+open BLANKCFG, "< config/blank.cfg";
 while(<BLANKCFG>) {
 	chomp;
 	next if(m/^\s{0,}$/);
