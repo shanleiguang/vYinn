@@ -44,7 +44,7 @@ foreach (@lines) {
 	$yin{$k} = $v;
 }
 
-my ($cw, $ch, $cts) = ($yin{'canvas_width'}, $yin{'canvas_height'}, $yin{'canvas_testline_spacing'});
+my ($cw, $ch, $cb, $cts) = ($yin{'canvas_width'}, $yin{'canvas_height'}, $yin{'canvas_background_image'}, $yin{'canvas_testline_spacing'});
 my ($fac, $ft, $fw, $fh) = ($yin{'frame_autocrop'}, $yin{'frame_type'}, $yin{'frame_width'}, $yin{'frame_height'});
 my ($fsr, $fcr, $flw) = ($yin{'frame_square_radius'}, $yin{'frame_circle_radius'}, $yin{'frame_line_width'});
 my ($fea, $feb) = ($yin{'frame_ellipse_a'}, $yin{'frame_ellipse_b'});
@@ -135,9 +135,11 @@ if($opts{'t'}) {
 	$yimg->Draw(primitive => 'rectangle', points => get_2points($ix, $iy, $ix+$iw, $iy+$ih), fill => 'white');
 	$yimg->Annotate(text => "Canvas size: $cw x $ch", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is, fill => 'black');
 	$yimg->Annotate(text => "Frame  size: $fw x $fh", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*2, fill => 'black');
-	$yimg->Annotate(text => "Frame line width: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*3, fill => 'black');
+	$yimg->Annotate(text => "Frame line width: $flw", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*3, fill => 'black');
 	$yimg->Annotate(text => "Characters number: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*4, fill => 'black');
 	$yimg->Annotate(text => "Yinn type: $ytype", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*5, fill => 'black');
+} else {
+	$yimg->Spread(radius => $esr, interpolate => $esi) if($esr and $esi); #添加印框边缘扩散效果
 }
 
 #打印印文文字
@@ -164,8 +166,9 @@ foreach my $cid (0..$#ychars) {
 	$cimg->Set(size => $chw.'x'.$chh);
 	$cimg->ReadImage('canvas:transparent');
 	$cimg->Annotate(text => $char, font => '@'.$yfont, pointsize => $cfs, x => -$la, y => $cfs,
-		fill => $yfcolor, stroke => $yfcolor, strokewidth => $ytsw, antialias => 'false', rotate => $crd);
+		fill => $yfcolor, stroke => $yfcolor, strokewidth => $ytsw, antialias => 'true', rotate => $crd);
 	$cimg->AdaptiveResize(width => $chw*$cwr, height => $chh*$chr);
+	$cimg->Edge(radius => 2.2) if($ev and rand(1) >= 0.75);
 	$cimg->Write("tmp/$char$cid.png");
 	my ($cx, $cy) = split /,/, $ycoords[$cid];
 
@@ -194,8 +197,6 @@ if(not $opts{'t'}) {
 		}
 	}
 
-	#添加扩散效果
-	$yimg->Spread(radius => $esr, interpolate => $esi) if($esr and $esi);
 	#印稿黑白色替换为印章设置的背景、前景色
 	$yimg->AutoThreshold('OTSU');
 	$yimg->Colorspace('RGB');
@@ -207,6 +208,14 @@ if(not $opts{'t'}) {
 	#切除印框外的画布
 	if($fac) {
 		$yimg->Crop(width => $fw+4, height => $fh+4, x => ($cw-$fw)/2-2, y => ($ch-$fh)/2-2);
+	}
+	#如果印底为透明色且设置了宣纸背景图片，则单独生成一张宣纸背景的效果图
+	if($cb and $ybc =~ m/^transparent$/i) {
+		my $paper = Image::Magick->new();
+		$paper->ReadImage($cb);
+		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
+		$paper->Composite(image => $yimg);
+		$paper->Write('image/'.$cid.'_'.$ytype.'_paper.jpg');
 	}
 }
 

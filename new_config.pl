@@ -48,8 +48,8 @@ my ($zw, $zh) = (($fw-$flw*2)/$cols, ($fh-$flw*2)/$rows);
 my $fs = $opts{'s'} ? $opts{'s'} : int(($zw <= $zh) ? $zw : $zh);
 my ($coords, $trans, $fsizes) = ('', '', '');
 
-foreach my $i (1..$rows) {
-	foreach my $j (0..$cols-1) {
+foreach my $i (1..$cols) {
+	foreach my $j (0..$rows-1) {
 		my $cx = int($cw/2+$fw/2-$flw-$zw*$i+0.5);
 		my $cy = int($ch/2-$fh/2+$flw+$zh*$j+0.5);
 		#print "cx:$cx cy:$cy\n";
@@ -72,7 +72,7 @@ $config{'yin_font_size'} = "/\n".$fsizes;
 my $cfgfn = 'config/new.cfg';
 
 open NEWCFG, "> $cfgfn";
-print "\tcreat 'config/new.cfg' ...";
+print "\tcreate 'config/new.cfg' ...";
 foreach my $k (sort keys %config) {
 	print NEWCFG "$k=$config{$k}\n";
 }
