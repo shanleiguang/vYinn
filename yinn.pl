@@ -212,9 +212,10 @@ if(not $opts{'t'}) {
 	#如果印底为透明色且设置了宣纸背景图片，则单独生成一张宣纸背景的效果图
 	if($cb and $ybc =~ m/^transparent$/i) {
 		my $paper = Image::Magick->new();
+		my ($yw, $yh) = ($yimg->Get('width'), $yimg->Get('height'));
 		$paper->ReadImage($cb);
 		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
-		$paper->Composite(image => $yimg);
+		$paper->Composite(image => $yimg, x => ($cw-$yw)/2, y => ($ch-$yh)/2);
 		$paper->Write('image/'.$cid.'_'.$ytype.'_paper.jpg');
 	}
 }
