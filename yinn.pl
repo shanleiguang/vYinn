@@ -168,7 +168,7 @@ foreach my $cid (0..$#ychars) {
 	$cimg->Annotate(text => $char, font => '@'.$yfont, pointsize => $cfs, x => -$la, y => $cfs,
 		fill => $yfcolor, stroke => $yfcolor, strokewidth => $ytsw, antialias => 'true', rotate => $crd);
 	$cimg->AdaptiveResize(width => $chw*$cwr, height => $chh*$chr);
-	$cimg->Edge(radius => 2.2) if($ev and rand(1) >= 0.75);
+	#$cimg->Edge(radius => 2.2) if($ev and rand(1) >= 0.75);
 	$cimg->Write("tmp/$char$cid.png");
 	my ($cx, $cy) = split /,/, $ycoords[$cid];
 
