@@ -3,7 +3,7 @@
 
 - vRain是一款中文古籍電子印章設計和製作工具。
 
-![image](https://github.com/shanleiguang/vYinn/blob/main/02.png)
+![image](https://github.com/shanleiguang/vYinn/blob/main/02.jpg)
 
 # vYinn功能：
 
