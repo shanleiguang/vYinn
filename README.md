@@ -30,3 +30,7 @@
 - 使用'new_config.pl'脚本从'blank.cfg'初始化生成新印的new.cfg，例如./perl new_config -n 4,4 （4行4列）
 - 使用'yinn.pl'带'-t'参数绘制设计侧图，打开'image'目录下带'test'后缀的图片，调整其配置文件中的文字坐标等参数。
 - 使用'yinn.pl'不带'-t'参数生成最终效果图及应用图（透明底色并裁切）。
+
+# Buy me a coffee
+
+![image](https://github.com/shanleiguang/vYinn/blob/main/qcode.png)
