@@ -80,14 +80,14 @@ print "done\n";
 close;
 
 sub print_help {
-	print <<EOF
-> $0 从'config/blank.cfg'创建新印章配置文件'config/new.cfg'
-  -c 设置画布宽高（可选，默认数值见blank.cfg） -n 1000,1000
-  -f 设置印框宽高（可选，默认数值见blank.cfg） -f 500,500
-  -l 设置印框线宽（可选，默认数值见blank.cfg） -l 15
-  -s 设置印文字体大小（可选，默认自动计算） -s 110
-  -n 设置文字行列数，-n 3,4 三行四列
-EOF
+	print <<END
+> $0\t从'config/blank.cfg'创建新印章配置文件'config/new.cfg'
+  -c\t设置画布宽高（可选，默认数值见blank.cfg） -n 1000,1000
+  -f\t设置印框宽高（可选，默认数值见blank.cfg） -f 500,500
+  -l\t设置印框线宽（可选，默认数值见blank.cfg） -l 15
+  -s\t设置印文字体大小（可选，默认自动计算） -s 110
+  -n\t设置文字行列数，-n 3,4 三行四列
+END
 }
 
 

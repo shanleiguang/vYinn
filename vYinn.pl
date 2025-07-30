@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-#中文古籍印章设计与制作工具 V1.0
-#by shanleiguang, 2025,06
+#兀雨书屋中文古籍数字复刻计划：中文古籍印章设计制作工具
+#by shanleiguang@gmail.com, 2025,07
 use strict;
 use warnings;
 
@@ -10,22 +10,27 @@ use Getopt::Std;
 use Encode;
 use utf8;
 
+$| = 1; #autoflush
 binmode(STDIN, ':encoding(utf8)');
 binmode(STDOUT, ':encoding(utf8)');
 binmode(STDERR, ':encoding(utf8)');
 
+my ($software, $version) = ('vYinn', '1.0');
 my %opts;
 
-getopts('tc:', \%opts);
+getopts('htc:', \%opts);
+
+print_help() and exit if(defined $opts{'h'});
 
 if(not defined $opts{'c'} or not -f "config/$opts{'c'}.cfg") {
-	print "error: no config, ./$0 -c 01\n";
+	print "错误: 缺少印章配置文件参数或配置文件不存在， ./$0 -c 01\n";
 	exit;
 }
 
 my $cid = $opts{'c'};
 my $content;
 
+#读取印章制作配置文件
 open CONFIG, "< config/$cid.cfg";
 { local $/ = undef; $content = <CONFIG>; }
 close(CONFIG);
@@ -58,7 +63,22 @@ my ($ebr, $ebs) = ($yin{'effect_blur_radius'}, $yin{'effect_blur_sigma'});
 my ($ev, $eo) = ($yin{'effect_vintage'}, $yin{'effect_oilpaint'});
 my ($esr, $esi) = ($yin{'effect_spread_radius'}, $yin{'effect_spread_interpolate'});
 
-print "fw: $yin{'frame_width'}, fh: $fh\n";
+print '='x80, "\n";
+print "    印章配置参数\n";
+print '-'x80, "\n";
+print '测试模式：', ($opts{'t'}) ? '是' : '否', "\t测线间距：$cts\n";
+print "画布长度：$cw\t画布宽度：$ch\n";
+print "印框长度：$fw\t印框宽度：$fh\n";
+print '印框类型：', ($ft == 0) ? '圆形' : ($ft == 1) ? '方形' : ($ft == 2) ? '圆角方形' : ($ft == 3) ? '椭圆形' : '无效', "\n";
+print '印文类型：', ($ytype == 0) ? '阴文' : ($ytype == 1) ? '阳文' : '无效', "\n";
+print "篆文字体：$yfont\n";
+print "印文文字：$ytext\n";
+print '----以下参数测试模式无效', '-'x56, "\n";
+print "印泥颜色：$ytc\n";
+print "印面背景：$ybc（通常设置为'transparent'）\n";
+print '自动裁切：', ($fac == 0) ? '否' : ($fac == 1) ? '是，将按印框尺寸裁切' : '无效', "\n";
+print '背景图片：', ($cb) ? "$cb, 同时生成该背景效果图" : '无', "\n";
+print '='x80, "\n";
 
 #画布图层
 my $yimg = Image::Magick->new();
@@ -88,7 +108,14 @@ $fimg->Set(size => $fw.'x'.$fh);
 $fimg->ReadImage("canvas:$ybcolor");
 #打印印框
 if($ft == 0) { #圆形
-	$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
+	$fimg->Draw(primitive => 'ellipse', 
+        points => get_points_ellipse($fw/2, $fh/2, $fcr, $fcr),
+        fill => $ybcolor,
+        stroke => $yfcolor,
+        strokewidth => $flw,
+        antialias => 'true'
+    );
+    $yimg->Composite(image => $fimg, x => ($cw-$fw)/2, y => ($ch-$fh)/2);
 }
 
 if($ft == 1) { #方形
@@ -154,8 +181,6 @@ foreach my $cid (0..$#ychars) {
 	my $char = $ychars[$cid];
 	my ($cwr, $chr, $crd) = split /\,/, $ytrans[$cid];
 
-	print "\t->$char\n";
-
 	$face->set_char_size($cfs, $cfs, 72, 72);
 	#获取该字体文字图像的对齐上、左对齐数值
 	my $glyph = $face->glyph_from_char($char);
@@ -170,18 +195,23 @@ foreach my $cid (0..$#ychars) {
 	$cimg->Set(size => $chw.'x'.$chh);
 	$cimg->ReadImage('canvas:transparent');
 	$cimg->Annotate(text => $char, font => '@'.$yfont, pointsize => $cfs, x => -$la, y => $cfs,
-		fill => $yfcolor, stroke => $yfcolor, strokewidth => $ytsw, antialias => 'true', rotate => $crd);
-	$cimg->AdaptiveResize(width => $chw*$cwr, height => $chh*$chr);
-	#$cimg->Edge(radius => 2.2) if($ev and rand(1) >= 0.75);
-	$cimg->Write("tmp/$char$cid.png");
-	my ($cx, $cy) = split /,/, $ycoords[$cid];
+		fill => $yfcolor, stroke => $yfcolor, strokewidth => $ytsw, antialias => 'true', rotate => $crd); #写入字符，旋转变形
+	$cimg->AdaptiveResize(width => $chw*$cwr, height => $chh*$chr); #长宽变形调整
+	$cimg->Write("tmp/$char$cid.png") if($opts{'t'}); #测试模式时，单字图片存入tmp目录
 
-	$yimg->Composite(image => $cimg, x => $cx, y => $cy);
+	my ($cx, $cy) = split /,/, $ycoords[$cid];
+	$cid++;
+	$cid = '0'.$cid if($cid <= 9);
+	print "->[$cid]'$char' 坐标：($cx,$cy），大小：$cfs, 变形：（长x$cwr, 宽x$chr, 旋转$crd）\n";
+	$yimg->Composite(image => $cimg, x => $cx, y => $cy); #合并到印图字符坐标位置
 }
 
+my $yinfn = $cid.'_'.$ytype;
+
+print '='x80, "\n";
 if(not $opts{'t'}) {
-	if($ev == 1) { #做旧做残，增加随机大小的椭圆斑点图层
-		my $pnum = 66;
+	if($ev == 1) { #做旧做残，添加整个画布内的随机大小的椭圆斑点图层
+		my $pnum = 66; #强度，越大斑点越多
 		foreach my $i (1..$pnum) {
 	    	my ($px, $py) = (int(rand($cw)), int(rand($ch)));
 	    	my $size = 5+int(rand(10));    
@@ -201,7 +231,7 @@ if(not $opts{'t'}) {
 		}
 	}
 
-	#印稿黑白色替换为印章设置的背景、前景色
+	#印稿黑白色替换为印章配置中的印泥色及背景色
 	$yimg->AutoThreshold('OTSU');
 	$yimg->Colorspace('RGB');
 	$yimg->Opaque(color => 'white', fill => $ytc, invert => 'false');
@@ -209,25 +239,36 @@ if(not $opts{'t'}) {
 	#添加模糊、油墨效果
 	$yimg->AdaptiveBlur(radius => $ebr, sigma => $ebs) if($ebr and $ebs);
 	$yimg->OilPaint(radius => $eo) if($eo);
-	#切除印框外的画布
+	#自动裁切时，切除印框外的画布
 	if($fac) {
 		$yimg->Crop(width => $fw+4, height => $fh+4, x => ($cw-$fw)/2-2, y => ($ch-$fh)/2-2);
 	}
-	#如果印底为透明色且设置了宣纸背景图片，则单独生成一张宣纸背景的效果图
+	#如果印底为透明色且设置了宣纸背景图片，则额外生成一张宣纸背景的效果图，通常用于展示
 	if($cb and $ybc =~ m/^transparent$/i) {
 		my $paper = Image::Magick->new();
 		my ($yw, $yh) = ($yimg->Get('width'), $yimg->Get('height'));
 		$paper->ReadImage($cb);
 		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
 		$paper->Composite(image => $yimg, x => ($cw-$yw)/2, y => ($ch-$yh)/2);
-		$paper->Write('image/'.$cid.'_'.$ytype.'_paper.jpg');
+		$paper->Write('image/'.$yinfn.'_paper.jpg');
+		print "已保存到'images/$yinfn.png'\n";
 	}
 }
 
-my $yinfn = $cid.'_'.$ytype;
-
 $yinfn.= '_test' if(defined $opts{'t'});
 $yimg->Write("image/$yinfn.png");
+print "已保存到'images/$yinfn.png'\n";
+print '='x80, "\n";
+
+sub print_help {
+	print <<END
+   ./$software\t$version，兀雨书屋古籍印章设计制作工具
+	-h\t帮助信息
+	-t\t测试模式，生成test后缀名带测试辅助信息的图片，根据效果调整印章cfg文件参数
+	-c\t印章配置文件名
+		作者：GitHub\@shanleiguuang，小红书\@兀雨书屋，2025
+END
+}
 
 sub get_2points {
 	my ($x1, $y1, $x2, $y2) = @_;

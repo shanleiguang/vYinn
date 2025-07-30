@@ -32,8 +32,12 @@ my ($df, $sw, $sh, $cx, $cy, $cw, $ch);
 my $sy = Image::Magick->new();
 
 $sy->ReadImage("src/$sf");
+
+($sw, $sh) = ($sy->Get('Width'), $sy->Get('Height'));
+print "$sw x $sh\n";
 $sy->Rotate($rd) if(defined $opts{'r'});
 ($sw, $sh) = ($sy->Get('Width'), $sy->Get('Height'));
+print "$sw x $sh\n";
 
 if(defined $opts{'t'}) {
 	my $tm = Image::Magick->new();
@@ -45,17 +49,19 @@ if(defined $opts{'t'}) {
 	$tl->ReadImage('canvas:transparent');
 	foreach my $i (0..int($sw/$sd)) {
 		$tl->Draw(primitive => 'line', points => get_2points($sd*$i, 0, $sd*$i, $sh), fill => '#666666');
-		$tl->Annotate(text => $i, font => 'Courier', pointsize => 10, x => $sd*$i, y => $sd, fill => 'black');
+		$tl->Annotate(text => $i, font => 'Courier', pointsize => $sd/2, x => $sd*$i, y => $sd, fill => 'black');
 	}
 	foreach my $j (0..int($sh/$sd)) {
 		$tl->Draw(primitive => 'line', points => get_2points(0, $sd*$j, $sw, $sd*$j), fill => '#666666');
-		$tl->Annotate(text => $j, font => 'Courier', pointsize => 10, x => $sd, y => $sd*$j, fill => 'black');
+		$tl->Annotate(text => $j, font => 'Courier', pointsize => $sd/2, x => $sd, y => $sd*$j, fill => 'black');
 	}
 
 	if(defined $opts{'a'} and defined $opts{'b'}) {
 		($cx, $cy) = split /\,/, $opts{'a'};
 		($cw, $ch) = split /\,/, $opts{'b'};
-		$tl->Annotate(text => 'A', font => 'Courier', pointsize => 20, x => $cx-10, y => $cy-10,
+		$tl->Annotate(text => "A($cx,$cy)", font => 'Courier', pointsize => $sd, x => $cx, y => $cy-$sd/2,
+			fill => 'black', stroke => 'black', strokewidth => 1);
+		$tl->Annotate(text => "B(+$cw,+$ch)", font => 'Courier', pointsize => $sd, x => $cx+$cw, y => $cy+$ch+$sd,
 			fill => 'black', stroke => 'black', strokewidth => 1);
 		$tl->Draw(primitive => 'rectangle', points => get_2points($cx, $cy, $cx+$cw, $cy+$ch),
 			fill => 'transparent', stroke => 'black', strokewidth => 3);
@@ -71,7 +77,7 @@ if(defined $opts{'t'}) {
 if(defined $opts{'a'} and defined $opts{'b'}) {
 	($cx, $cy) = split /\,/, $opts{'a'};
 	($cw, $ch) = split /\,/, $opts{'b'};
-	$sy->Crop(x => $cx, y => $cy, width => $cw, height => $ch);
+	$sy->Crop(x => $cx+$sw*$rd/180, y => $cy+$sh*$rd/180, width => $cw, height => $ch);
 }
 
 $sy->UnsharpMask(radius => 2, sigma => 1, gain => 1, threshold => 1);
