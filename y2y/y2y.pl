@@ -15,24 +15,22 @@ binmode(STDERR, ':encoding(utf8)');
 
 my %opts;
 
-getopts('tnves:a:b:c:d:r:', \%opts);
+getopts('htnves:a:b:c:d:r:', \%opts);
 
-if(not defined $opts{'s'}) {
-	print "\terror: no '-s', src yin image!\n"; exit;
-}
+print_help() and exit if(defined $opts{'h'});
+if(not defined $opts{'s'}) { print "\terror: no '-s'!\n"; exit; }
 if(not -f "src/$opts{'s'}") {
-	print "\terror: 'src/$opts{'s'}' not exist!\n"; exit;
+	print "\terror: 'src/$opts{'s'}' src yin image not found!\n"; exit;
 }
 
 my $sf = $opts{'s'};
 my $yc = (defined $opts{'c'}) ? $opts{'c'} : '#874434'; #印文前景色
 my $sd = (defined $opts{'d'}) ? $opts{'d'} : 20; #测试辅助线间距，默认为20
 my $rd = (defined $opts{'r'}) ? $opts{'r'} : 0; #原图旋转角度，正数为顺时针，默认为0
-my ($df, $sw, $sh, $cx, $cy, $cw, $ch);
+my ($df, $sw, $sh, $cx, $cy, $cw, $ch); #目的图片，原图片宽、高，裁切起点坐标（x，y），裁切宽、高
 my $sy = Image::Magick->new();
 
 $sy->ReadImage("src/$sf");
-
 ($sw, $sh) = ($sy->Get('Width'), $sy->Get('Height'));
 print "$sw x $sh\n";
 $sy->Rotate($rd) if(defined $opts{'r'});
@@ -40,8 +38,8 @@ $sy->Rotate($rd) if(defined $opts{'r'});
 print "$sw x $sh\n";
 
 if(defined $opts{'t'}) {
-	my $tm = Image::Magick->new();
-	my $tl = Image::Magick->new();
+	my $tm = Image::Magick->new(); #灰色透明遮罩图层
+	my $tl = Image::Magick->new(); #辅助线图层
 
 	$tm->Set(size => $sw.'x'.$sh);
 	$tm->ReadImage('canvas:#999999');
@@ -80,7 +78,7 @@ if(defined $opts{'a'} and defined $opts{'b'}) {
 	$sy->Crop(x => $cx+$sw*$rd/180, y => $cy+$sh*$rd/180, width => $cw, height => $ch);
 }
 
-$sy->UnsharpMask(radius => 2, sigma => 1, gain => 1, threshold => 1);
+$sy->UnsharpMask(radius => 2, sigma => 1, gain => 1, threshold => 1); #锐化
 $sy->Negate() if(defined $opts{'n'}); #阴阳文反转
 $sy->AutoThreshold('OTSU');
 $sy->Colorspace('RGB');
@@ -101,6 +99,22 @@ if(defined $opts{'e'}) {
 	$eb->Composite(image => $sy, x => $cw/2, y => $ch/2, compose => 'Over');
 	$df = (split /\./, $df)[0].'_paper.jpg';
 	$eb->Write("dst/$df");
+}
+
+sub print_help {
+	print <<END
+   ./$0，古籍印章抠图工具
+	-h\t帮助信息
+	-t\t打印测试图
+	-d\t测试图辅助线间距，默认为20
+	-r\t原印图旋转角度
+	-a\t裁切起点坐标 -a 100,100
+	-b\t裁切范围宽高 -b 200,200
+	-c\t新印印泥颜色 -c #874434
+	-v\t添加做旧效果
+	-e\t多生成以'paper.jpg'为背景的新印章
+		作者：GitHub\@shanleiguuang，小红书\@兀雨书屋，2025
+END
 }
 
 sub get_2points {
