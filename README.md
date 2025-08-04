@@ -17,6 +17,7 @@
 - 每個文字可設置單獨字體大小、座標位置、橫縱變形比例、旋轉度數。
 - 簡單的做殘、油墨、擴散效果。
 - 可生成透明底色PNG文件，方便應用。
+- 可從現有古籍印文圖片中扣取並生成新的透明底色印文圖片（y2y目錄下）。
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/03.png)
 
@@ -31,3 +32,8 @@
 - 使用'new_config.pl'脚本从'blank.cfg'初始化生成新印的new.cfg，例如./perl new_config -n 4,4 （4行4列）
 - 使用'yinn.pl'带'-t'参数绘制设计侧图，打开'image'目录下带'test'后缀的图片，调整其配置文件中的文字坐标等参数。
 - 使用'yinn.pl'不带'-t'参数生成最终效果图及应用图（透明底色并裁切）。
+- y2y目录下是從現有古籍印文圖片中扣取並生成新的透明底色印文圖片的脚本。
+
+## 赞助支持
+如果您覺得本工具對您的工作或生活有些微幫助，請給予必要的支持，我也有動力繼續完善更新，謝謝！
+![image](https://github.com/shanleiguang/vYinn/blob/main/sponsor.png)
