@@ -34,6 +34,6 @@
 - 使用'yinn.pl'不带'-t'参数生成最终效果图及应用图（透明底色并裁切）。
 - y2y目录下是從現有古籍印文圖片中扣取並生成新的透明底色印文圖片的脚本。
 
-## 赞助支持
+# 赞助支持 Other ways to sponsor
 如果您覺得本工具對您的工作或生活有些微幫助，請給予必要的支持，我也有動力繼續完善更新，謝謝！
 ![image](https://github.com/shanleiguang/vYinn/blob/main/sponsor.png)
