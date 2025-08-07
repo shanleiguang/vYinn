@@ -4,6 +4,7 @@
 use strict;
 use warnings;
 
+use Font::FreeType;
 use Getopt::Std;
 use Encode;
 use utf8;
@@ -42,6 +43,7 @@ my $cw = $opts{'c'} ? (split /,/, $opts{'c'})[0] : $config{'canvas_width'};
 my $ch = $opts{'c'} ? (split /,/, $opts{'c'})[1] : $config{'canvas_height'};
 my $fw = $opts{'f'} ? (split /,/, $opts{'f'})[0] : $config{'frame_width'};
 my $fh = $opts{'f'} ? (split /,/, $opts{'f'})[1] : $config{'frame_height'};
+my $fn = $config{'yin_font'};
 my $flw = $opts{'l'} ? $opts{'l'} : $config{'frame_line_width'};
 my ($rows, $cols) = split /,/, $opts{'n'};
 my ($zw, $zh) = (($fw-$flw*2)/$cols, ($fh-$flw*2)/$rows);

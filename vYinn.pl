@@ -126,7 +126,9 @@ if($ft == 1) { #方形
 
 if($ft == 2) { #圆角方形
 	if($ytype == 0) {
-		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
+		my $fcolor = $yfcolor;
+		$fcolor = 'gray' if($opts{'t'});
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $fcolor);
 	}
 	if($ytype == 1) {
 		$fimg->Draw(primitive => 'roundRectangle', points => get_3points(0,0,$fw,$fh,$fsr,$fsr), fill => $yfcolor);
@@ -152,21 +154,26 @@ if($opts{'t'}) {
 	foreach my $i (0..$rows) {
 		my $ly = ($ch-$fh)/2+$flw+$fth*$i;
 		$yimg->Draw(primitive => 'line', points => get_2points(0,$ly,$cw,$ly), stroke => 'red', strokewidth => 1);
-		$yimg->Annotate(text => 'y:'.int($ly), font => 'Courier', pointsize => 20, x => ($cw-$fw)/2-100, y => $ly-10, fill => 'white');
+		$yimg->Annotate(text => 'y:'.int($ly), font => 'Courier', pointsize => 20, x => ($cw-$fw)/2-100, y => $ly-10,
+			fill => 'white', stroke => 'white', strokewidth => 1);
 	}
 	foreach my $j (0..$cols) {
 		my $lx = ($cw-$fw)/2+$flw+$ftw*$j;
 		$yimg->Draw(primitive => 'line', points => get_2points($lx,0,$lx,$ch), stroke => 'red', strokewidth => 1);
-		$yimg->Annotate(text => 'x:'.int($lx), font => 'Courier', pointsize => 20, x => $lx, y => 50+($ch-$fh-$flw*2-100)/2/$cols*$j, fill => 'white');
+		$yimg->Annotate(text => 'x:'.int($lx), font => 'Courier', pointsize => 20, x => $lx, y => 50+($ch-$fh-$flw*2-100)/2/$cols*$j,
+			fill => 'white', stroke => 'white', strokewidth => 1);
 	}
-	my ($iw, $ih, $is) = (300, 80, 15);
+	$yimg->Draw(primitive => 'rectangle', points => get_2points(40, 40, 215, 60), fill => 'white');
+	$yimg->Annotate(text => 'topleft:[0,0]', font => 'Courier', pointsize => 20, x => 50, y => 55, fill => 'black');
+	my ($iw, $ih, $is) = (300, 100, 15);
 	my ($ix, $iy) = ($cw-$iw-20, $ch-$ih-20);
 	$yimg->Draw(primitive => 'rectangle', points => get_2points($ix, $iy, $ix+$iw, $iy+$ih), fill => 'white');
 	$yimg->Annotate(text => "Canvas size: $cw x $ch", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is, fill => 'black');
-	$yimg->Annotate(text => "Frame  size: $fw x $fh", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*2, fill => 'black');
-	$yimg->Annotate(text => "Frame line width: $flw", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*3, fill => 'black');
-	$yimg->Annotate(text => "Characters number: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*4, fill => 'black');
-	$yimg->Annotate(text => "Yinn type: $ytype", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*5, fill => 'black');
+	$yimg->Annotate(text => "Testline scale units: $cts", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*2, fill => 'black');
+	$yimg->Annotate(text => "Frame  size: $fw x $fh", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*3, fill => 'black');
+	$yimg->Annotate(text => "Frame line width: $flw", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*4, fill => 'black');
+	$yimg->Annotate(text => "Characters number: $rows x $cols", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*5, fill => 'black');
+	$yimg->Annotate(text => "Yinn type: $ytype", font => 'Courier', pointsize => $is, x => $ix+10, y => $iy+$is*6, fill => 'black');
 } else {
 	$yimg->Spread(radius => $esr, interpolate => $esi) if($esr and $esi); #添加印框边缘扩散效果
 }
@@ -250,14 +257,14 @@ if(not $opts{'t'}) {
 		$paper->ReadImage($cb);
 		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
 		$paper->Composite(image => $yimg, x => ($cw-$yw)/2, y => ($ch-$yh)/2);
-		$paper->Write('image/'.$yinfn.'_paper.jpg');
-		print "已保存到'images/$yinfn.png'\n";
+		$paper->Write('yins/'.$yinfn.'_paper.jpg');
+		print "已保存到'yins/$yinfn", '_paper.jpg', "\n";
 	}
 }
 
 $yinfn.= '_test' if(defined $opts{'t'});
-$yimg->Write("image/$yinfn.png");
-print "已保存到'images/$yinfn.png'\n";
+$yimg->Write("yins/$yinfn.png");
+print "已保存到'yins/$yinfn.png'\n";
 print '='x80, "\n";
 
 sub print_help {
