@@ -10,7 +10,7 @@
 
 ### 基本功能
 
-- 簡單實用的設計排版輔助。
+- 簡單實用的設計排版輔助。（注意：草稿測試圖中的白色代表印泥色。）
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/01.png)
 
@@ -30,6 +30,7 @@
 
 ### 使用說明
 
+- 注意：草稿測試圖中的白色代表印泥色。
 - 查看 'config/blank.cfg'，瞭解畫布、印框、印文、效果四類參數的含義。
 - 查看 'yins/' 目錄下的示例及其 'config/' 目錄下對應的配置文件。
 - 使用 'new_config.pl' 腳本從 'config/blank.cfg' 初始化生成新印的 new.cfg，例如 perl new_config.pl -n 4,4 （4行4列）。
