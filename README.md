@@ -1,17 +1,17 @@
 
-![image](https://github.com/shanleiguang/vYinn/blob/main/00.png)
+![image](https://github.com/shanleiguang/vYinn/blob/main/images/00.png)
 # vYinn is  
 
 - 一款中文古籍電子印章設計和製作工具。
 - A tool for designing and producing electronic seals for Chinese ancient texts.
 
-![image](https://github.com/shanleiguang/vYinn/blob/main/02.png)
+![image](https://github.com/shanleiguang/vYinn/blob/main/images/02.png)
 
 # vYinn基本功能：
 
 - 支持簡單的設計排版。
 
-![image](https://github.com/shanleiguang/vYinn/blob/main/01.png)
+![image](https://github.com/shanleiguang/vYinn/blob/main/images/01.png)
 
 - 印文支持陰文、陽文。
 - 印框支持圓形、方形及橢圓。
@@ -20,7 +20,7 @@
 - 可生成透明底色PNG文件，方便應用。
 - 可從現有古籍印文圖片中扣取並生成新的透明底色印文圖片（y2y目錄下）。
 
-![image](https://github.com/shanleiguang/vYinn/blob/main/03.png)
+![image](https://github.com/shanleiguang/vYinn/blob/main/images/03.png)
 
 - 所有參數均可通過配置文件管理，初始配置文件可自動生成。
 - 采用Perl语言开发，需安装Image::Magick等模塊。
