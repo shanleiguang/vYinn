@@ -179,6 +179,8 @@ if($opts{'t'}) {
 }
 
 #打印印文文字
+$yfont = 'fonts/'.$yfont;
+
 my @ychars = split //, $ytext;
 my $freetype = Font::FreeType->new;
 my $face = $freetype->face($yfont);
@@ -258,7 +260,7 @@ if(not $opts{'t'}) {
 		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
 		$paper->Composite(image => $yimg, x => ($cw-$yw)/2, y => ($ch-$yh)/2);
 		$paper->Write('yins/'.$yinfn.'_paper.jpg');
-		print "已保存到'yins/$yinfn", '_paper.jpg', "\n";
+		print "宣纸背景效果图已保存到'yins/$yinfn", '_paper.jpg', "\n";
 	}
 }
 
@@ -269,10 +271,10 @@ print '='x80, "\n";
 
 sub print_help {
 	print <<END
-   ./$software\t$version，兀雨书屋古籍印章设计制作工具
-	-h\t帮助信息
-	-t\t测试模式，生成test后缀名带测试辅助信息的图片，根据效果调整印章cfg文件参数
-	-c\t印章配置文件名
+   ./$software $version，殷人 — 兀雨书屋古籍印章设计制作工具
+	-h 帮助信息
+	-c 印章配置文件名
+	-t 测试模式，生成test后缀名带测试辅助信息的图片，查看该图调整印章cfg参数达到预期效果
 		作者：GitHub\@shanleiguuang，小红书\@兀雨书屋，2025
 END
 }
