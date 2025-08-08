@@ -23,7 +23,7 @@
 - 可生成透明底色PNG文件，方便應用。
 - 可從現有古籍印文圖片中扣取並生成新的透明底色印文圖片（y2y目錄下）。
 - 初始配置文件可自動生成，所有參數均可通過配置文件管理。
-- 采用Perl语言开发，需安装Image::Magick等模塊。
+- 采用 Perl 语言开发，需安装 Image::Magick 等模塊。
 - 小紅書主頁：兀雨書屋。
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/03.png)
