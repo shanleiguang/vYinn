@@ -81,3 +81,6 @@ image/.DS_Store
 /tmp
 *.pdf
 /tmp
+config/new.cfg
+.DS_Store
+config/.DS_Store

@@ -98,7 +98,7 @@ if($opts{'t'}) {
 	}
 }
 
-#印章草稿背景、前景色
+#印章草稿背景、前景色，草稿状态白色代表印泥颜色
 my $ybcolor = ($ytype == 0) ? 'white' : 'black';
 my $yfcolor = ($ytype == 0) ? 'black' : 'white';
 #印框图层，框线等同文字
@@ -108,6 +108,12 @@ $fimg->Set(size => $fw.'x'.$fh);
 $fimg->ReadImage("canvas:$ybcolor");
 #打印印框
 if($ft == 0) { #圆形
+	if($ytype == 0) {
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
+	}
+	if($ytype == 1) {
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $ybcolor);
+	}
 	$fimg->Draw(primitive => 'ellipse', 
         points => get_points_ellipse($fw/2, $fh/2, $fcr, $fcr),
         fill => $ybcolor,
@@ -138,6 +144,12 @@ if($ft == 2) { #圆角方形
 }
 
 if($ft == 3) { #椭圆形
+	if($ytype == 0) {
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
+	}
+	if($ytype == 1) {
+		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $ybcolor);
+	}
 	$fimg->Draw(primitive => 'ellipse', 
         points => get_points_ellipse($fw/2, $fh/2, $fea, $feb),
         fill => $ybcolor,
@@ -148,9 +160,10 @@ if($ft == 3) { #椭圆形
     $yimg->Composite(image => $fimg, x => ($cw-$fw)/2, y => ($ch-$fh)/2);
 }
 
-#-t模式，打印辅助线
+#-t模式，打印辅助线，注意测试图中印框内白色代表印泥着色区域
 if($opts{'t'}) {
 	my ($ftw, $fth) = (($fw-$flw*2)/$cols, ($fh-$flw*2)/$rows);
+	
 	foreach my $i (0..$rows) {
 		my $ly = ($ch-$fh)/2+$flw+$fth*$i;
 		$yimg->Draw(primitive => 'line', points => get_2points(0,$ly,$cw,$ly), stroke => 'red', strokewidth => 1);
@@ -163,8 +176,10 @@ if($opts{'t'}) {
 		$yimg->Annotate(text => 'x:'.int($lx), font => 'Courier', pointsize => 20, x => $lx, y => 50+($ch-$fh-$flw*2-100)/2/$cols*$j,
 			fill => 'white', stroke => 'white', strokewidth => 1);
 	}
-	$yimg->Draw(primitive => 'rectangle', points => get_2points(40, 40, 215, 60), fill => 'white');
+	$yimg->Draw(primitive => 'rectangle', points => get_2points(40, 40, 215, 80), fill => 'white');
 	$yimg->Annotate(text => 'topleft:[0,0]', font => 'Courier', pointsize => 20, x => 50, y => 55, fill => 'black');
+	$yimg->Annotate(text => 'white:YinNi', font => 'Courier', pointsize => 20, x => 50, y => 75, fill => 'black');
+
 	my ($iw, $ih, $is) = (300, 100, 15);
 	my ($ix, $iy) = ($cw-$iw-20, $ch-$ih-20);
 	$yimg->Draw(primitive => 'rectangle', points => get_2points($ix, $iy, $ix+$iw, $iy+$ih), fill => 'white');
@@ -196,10 +211,12 @@ foreach my $cid (0..$#ychars) {
 	my $la = $glyph->left_bearing();
 	my $ra = $glyph->right_bearing();
 	my $va = $glyph->vertical_advance();
+	my $gh = $glyph->height();
 	#print "$char -> $la, $ra, $va\n";
 	#每个字创建独立的图层
 	my $cimg = Image::Magick->new();
 	my ($chw, $chh) = ($cfs, $cfs+$va);
+	#my ($chw, $chh) = ($cfs, $gh+$va+40);
 
 	$cimg->Set(size => $chw.'x'.$chh);
 	$cimg->ReadImage('canvas:transparent');
@@ -256,7 +273,7 @@ if(not $opts{'t'}) {
 	if($cb and $ybc =~ m/^transparent$/i) {
 		my $paper = Image::Magick->new();
 		my ($yw, $yh) = ($yimg->Get('width'), $yimg->Get('height'));
-		$paper->ReadImage($cb);
+		$paper->ReadImage('images/'.$cb);
 		$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
 		$paper->Composite(image => $yimg, x => ($cw-$yw)/2, y => ($ch-$yh)/2);
 		$paper->Write('yins/'.$yinfn.'_paper.jpg');
