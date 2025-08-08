@@ -1,15 +1,15 @@
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/00.png)
-# vYinn is  
+# vYinn is 殷人
 
-- 一款中文古籍電子印章設計和製作工具。
-- A tool for designing and producing electronic seals for Chinese ancient texts.
+- 一款中文古籍電子印章設計和製作工具。它是本人中文古籍數字復刻計劃的一部分，配合vRain古籍電子書製作工具能夠生成更加古香古色的古籍復刻電子書。
+- A tool for designing and producing electronic seals for Chinese ancient books.
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/02.png)
 
 # vYinn基本功能：
 
-- 支持簡單的設計排版。
+- 簡單實用的設計排版。
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/01.png)
 
