@@ -70,11 +70,11 @@ print '测试模式：', ($opts{'t'}) ? '是' : '否', "\t测线间距：$cts\n"
 print "画布长度：$cw\t画布宽度：$ch\n";
 print "印框长度：$fw\t印框宽度：$fh\n";
 print '印框类型：', ($ft == 0) ? '圆形' : ($ft == 1) ? '方形' : ($ft == 2) ? '圆角方形' : ($ft == 3) ? '椭圆形' : '无效', "\n";
-print '印文类型：', ($ytype == 0) ? '阴文' : ($ytype == 1) ? '阳文' : '无效', "\n";
-print "篆文字体：$yfont\n";
+print '印文类型：', ($ytype == 0) ? '0-阴文' : ($ytype == 1) ? '1-阳文' : '无效', "\n";
+print "印文字体：$yfont\n";
 print "印文文字：$ytext\n";
 print '----以下参数测试模式无效', '-'x56, "\n";
-print "印泥颜色：$ytc\n";
+print "印泥颜色：$ytc（测试模式印泥颜色为白色）\n";
 print "印面背景：$ybc（通常设置为'transparent'）\n";
 print '自动裁切：', ($fac == 0) ? '否' : ($fac == 1) ? '是，将按印框尺寸裁切' : '无效', "\n";
 print '背景图片：', ($cb) ? "$cb, 同时生成该背景效果图" : '无', "\n";
@@ -98,22 +98,19 @@ if($opts{'t'}) {
 	}
 }
 
-#印章草稿背景、前景色，草稿状态白色代表印泥颜色
+#印章草稿背景、前景色，白色代表印泥颜色
+#阴文背景色为白色，前景色为黑色，白色代表印泥颜色
+#阳文背景色为黑色，前景色为白色，白色代表印泥颜色
 my $ybcolor = ($ytype == 0) ? 'white' : 'black';
 my $yfcolor = ($ytype == 0) ? 'black' : 'white';
 #印框图层，框线等同文字
 my $fimg = Image::Magick->new();
 
 $fimg->Set(size => $fw.'x'.$fh);
-$fimg->ReadImage("canvas:$ybcolor");
+$fimg->ReadImage('canvas:black');
 #打印印框
 if($ft == 0) { #圆形
-	if($ytype == 0) {
-		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
-	}
-	if($ytype == 1) {
-		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $ybcolor);
-	}
+	$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => 'black');
 	$fimg->Draw(primitive => 'ellipse', 
         points => get_points_ellipse($fw/2, $fh/2, $fcr, $fcr),
         fill => $ybcolor,
@@ -144,12 +141,6 @@ if($ft == 2) { #圆角方形
 }
 
 if($ft == 3) { #椭圆形
-	if($ytype == 0) {
-		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $yfcolor);
-	}
-	if($ytype == 1) {
-		$fimg->Draw(primitive => 'rectangle', points => get_2points(0,0,$fw,$fh), fill => $ybcolor);
-	}
 	$fimg->Draw(primitive => 'ellipse', 
         points => get_points_ellipse($fw/2, $fh/2, $fea, $feb),
         fill => $ybcolor,
@@ -163,7 +154,7 @@ if($ft == 3) { #椭圆形
 #-t模式，打印辅助线，注意测试图中印框内白色代表印泥着色区域
 if($opts{'t'}) {
 	my ($ftw, $fth) = (($fw-$flw*2)/$cols, ($fh-$flw*2)/$rows);
-	
+
 	foreach my $i (0..$rows) {
 		my $ly = ($ch-$fh)/2+$flw+$fth*$i;
 		$yimg->Draw(primitive => 'line', points => get_2points(0,$ly,$cw,$ly), stroke => 'red', strokewidth => 1);
