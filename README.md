@@ -3,7 +3,7 @@
 
 ### vYinn is 殷人
 
-- 一款中文古籍電子印章設計和製作工具。它是本人中文古籍數字復刻計劃的一部分，配合vRain古籍電子書製作工具能夠生成更加古香古色的古籍復刻電子書。
+- 一款中文古籍電子印章設計和製作工具。它是作者中文古籍數字復刻計劃的一部分，配合[vRain古籍刻本電子書製作工具](https://github.com/shanleiguang/vRain)能夠生成更加古香古色的古籍電子書。
 - A tool for designing and producing electronic seals for Chinese ancient books.
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/02.png)
@@ -24,13 +24,12 @@
 - 可從現有古籍印文圖片中扣取並生成新的透明底色印文圖片（y2y目錄下）。
 - 初始配置文件可自動生成，所有參數均可通過配置文件管理。
 - 采用 Perl 语言开发，需安装 Image::Magick 等模塊。
-- 小紅書主頁：兀雨書屋。
+- 作者小紅書主頁：兀雨書屋。
 
 ![image](https://github.com/shanleiguang/vYinn/blob/main/images/03.png)
 
 ### 使用說明
 
-- 注意：草稿測試圖中的白色代表印泥色。
 - 查看 'config/blank.cfg'，瞭解畫布、印框、印文、效果四類參數的含義。
 - 查看 'yins/' 目錄下的示例及其 'config/' 目錄下對應的配置文件。
 - 使用 'new_config.pl' 腳本從 'config/blank.cfg' 初始化生成新印的 new.cfg，例如 perl new_config.pl -n 4,4 （4行4列）。
@@ -38,8 +37,15 @@
 - 使用 'vyinn.pl' 無 '-t' 參數生成最終效果圖及應用圖（透明底色並裁切）。
 - 'y2y/' 目錄下是從現有古籍印文圖片中扣取並生成新的透明底色印文圖片的腳本。
 
-### 赞助支持 Other ways to sponsor
-
-如果您覺得本工具對您的工作或生活有些微幫助，請給予必要的支持（一杯咖啡），我也有動力繼續完善更新，謝謝！贊助後，您可添加微信諮詢使用或代碼解讀等相關問題。  
-If you feel that this tool is a little helpful to your work or life, please give the necessary support. After sponsorship, you can add WeChat consultation usage or code interpretation and other related questions.
-![image](https://github.com/shanleiguang/vYinn/blob/main/sponsor.png)
+## 赞助支持 Sponsorship
+![image](https://github.com/shanleiguang/vRain/blob/main/sponsor_new.png)  
+如果您覺得本工具對您的工作或生活有些微幫助，請給予必要的支持，我也有動力繼續完善更新，謝謝！   
+贊助後我將邀請您訪問vRainPro等私有庫項目（一個月時間），續訂可通過Sponsor按鈕或該私有項目頁面提示。較Pbulic項目Private項目有以下不同：
+>>微信或郵件諮詢答疑，包括運行環境調試、使用協助、代碼解讀、二次開發合作等相關問題；  
+>>代碼持續更新，註釋更詳細；  
+>>更多古籍排版實用標籤，如正文字體二次縮放、文字添加底框（圓角方框/圓形框）、文本預處理工具等；  
+>>更多模擬背景圖，如甲骨、碑拓、竹簡、做舊、手機壁紙等；  
+>>更多高質量樣例，如何vRain+vYinn結合應用案例；  
+>>訂購作者自製高質量全套成書（PDF目錄下展示）；  
+>>更多實用工具或相關開發樣例，如vModou兀雨墨斗（古籍掃描圖變形糾正工具）、農曆日曆日記本製作案例等。  
+![image](https://github.com/shanleiguang/vRain/blob/main/images/011.png)
