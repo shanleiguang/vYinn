@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-#兀雨书屋中文古籍数字复刻计划：中文古籍印章设计制作工具
-#by shanleiguang@gmail.com, 2025,07
+#vYinn殷人，兀雨书屋的中文古籍印章设计制作工具
+#by shanleiguang@gmail.com, 2025/07
 use strict;
 use warnings;
 
@@ -49,19 +49,24 @@ foreach (@lines) {
 	$yin{$k} = $v;
 }
 
+#画布参数
 my ($cw, $ch, $cb, $cts) = ($yin{'canvas_width'}, $yin{'canvas_height'}, $yin{'canvas_background_image'}, $yin{'canvas_testline_spacing'});
+#印框参数
 my ($fac, $ft, $fw, $fh) = ($yin{'frame_autocrop'}, $yin{'frame_type'}, $yin{'frame_width'}, $yin{'frame_height'});
 my ($fsr, $fcr, $flw) = ($yin{'frame_square_radius'}, $yin{'frame_circle_radius'}, $yin{'frame_line_width'});
 my ($fea, $feb) = ($yin{'frame_ellipse_a'}, $yin{'frame_ellipse_b'});
+#印文参数
 my ($ytext, $ytype, $yfont, $ytsw) = ($yin{'yin_text'}, $yin{'yin_type'}, $yin{'yin_font'}, $yin{'yin_text_strokewidth'});
 my ($ytc, $ybc) = ($yin{'yin_text_color'}, $yin{'yin_background_color'});
+my @ycoords = split /\|/, $yin{'yin_coords'}; #印文文字坐标
+my @yfsizes = split /\|/, $yin{'yin_font_size'}; #印文文字大小
+my @ytrans = split /\|/, $yin{'yin_trans'}; #印文文字拉伸、旋转
+#效果参数
+my ($ebr, $ebs) = ($yin{'effect_blur_radius'}, $yin{'effect_blur_sigma'}); #模糊
+my ($ev, $eo, $ep) = ($yin{'effect_vintage'}, $yin{'effect_oilpaint'}, $yin{'effect_spotsnum'}); #复古、油墨
+my ($esr, $esi) = ($yin{'effect_spread_radius'}, $yin{'effect_spread_interpolate'}); #边缘扩散
+#测试线行列数
 my ($rows, $cols) = ($yin{'test_rows'}, $yin{'test_cols'});
-my @ycoords = split /\|/, $yin{'yin_coords'};
-my @yfsizes = split /\|/, $yin{'yin_font_size'};
-my @ytrans = split /\|/, $yin{'yin_trans'};
-my ($ebr, $ebs) = ($yin{'effect_blur_radius'}, $yin{'effect_blur_sigma'});
-my ($ev, $eo) = ($yin{'effect_vintage'}, $yin{'effect_oilpaint'});
-my ($esr, $esi) = ($yin{'effect_spread_radius'}, $yin{'effect_spread_interpolate'});
 
 print '='x80, "\n";
 print "    印章配置参数\n";
@@ -74,7 +79,7 @@ print '印文类型：', ($ytype == 0) ? '0-阴文' : ($ytype == 1) ? '1-阳文'
 print "印文字体：$yfont\n";
 print "印文文字：$ytext\n";
 print '----以下参数测试模式无效', '-'x56, "\n";
-print "印泥颜色：$ytc（测试模式印泥颜色为白色）\n";
+print "印泥颜色：$ytc（测试模式下白色代表印泥）\n";
 print "印面背景：$ybc（通常设置为'transparent'）\n";
 print '自动裁切：', ($fac == 0) ? '否' : ($fac == 1) ? '是，将按印框尺寸裁切' : '无效', "\n";
 print '背景图片：', ($cb) ? "$cb, 同时生成该背景效果图" : '无', "\n";
@@ -98,7 +103,7 @@ if($opts{'t'}) {
 	}
 }
 
-#印章草稿背景、前景色，白色代表印泥颜色
+#印章草稿背景、前景色
 #阴文背景色为白色，前景色为黑色，白色代表印泥颜色
 #阳文背景色为黑色，前景色为白色，白色代表印泥颜色
 my $ybcolor = ($ytype == 0) ? 'white' : 'black';
@@ -227,10 +232,10 @@ my $yinfn = $cid.'_'.$ytype;
 
 print '='x80, "\n";
 if(not $opts{'t'}) {
-	if($ev == 1) { #做旧做残，添加整个画布内的随机大小的椭圆斑点图层
-		my $pnum = 66; #强度，越大斑点越多
+	if($ev == 1) { #做旧做残，添加印框内的随机大小的椭圆斑点图层
+		my $pnum = $ep ? $ep : 7; #强度，越大斑点越多
 		foreach my $i (1..$pnum) {
-	    	my ($px, $py) = (int(rand($cw)), int(rand($ch)));
+	    	my ($px, $py) = (int(rand($fw)), int(rand($fh)));
 	    	my $size = 5+int(rand(10));    
 	    	my $point = Image::Magick->new();
 	    	my $pcolor = ($ytype == 0) ? $yfcolor : $ybcolor;
@@ -244,7 +249,7 @@ if(not $opts{'t'}) {
 	    	$point->Rotate(degrees => rand(45)-22.5);
 	    	$point->OilPaint(radius => 1.5);
 	    	$point->AdaptiveBlur(radius => 2.2, sigma => 1, bias => -1);
-	    	$yimg->Composite(image => $point, x => $px-$size*0.4, y => $py, compose => 'Multiply');
+	    	$yimg->Composite(image => $point, x => ($cw-$fw)/2+$px, y => ($ch-$fh)/2+$py, compose => 'Multiply');
 		}
 	}
 
@@ -253,7 +258,7 @@ if(not $opts{'t'}) {
 	$yimg->Colorspace('RGB');
 	$yimg->Opaque(color => 'white', fill => $ytc, invert => 'false');
 	$yimg->Opaque(color => 'black', fill => $ybc, invert => 'false');
-	#添加模糊、油墨效果
+	#添加整体模糊、油墨效果
 	$yimg->AdaptiveBlur(radius => $ebr, sigma => $ebs) if($ebr and $ebs);
 	$yimg->OilPaint(radius => $eo) if($eo);
 	#自动裁切时，切除印框外的画布
