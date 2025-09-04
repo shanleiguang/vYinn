@@ -7,6 +7,7 @@ use warnings;
 use Image::Magick;
 use Font::FreeType;
 use Getopt::Std;
+use POSIX qw(strftime);
 use Encode;
 use utf8;
 
@@ -49,6 +50,7 @@ foreach (@lines) {
 	$yin{$k} = $v;
 }
 
+my $gr = 0.618; #黄金分割率
 #画布参数
 my ($cw, $ch) = ($yin{'canvas_width'}, $yin{'canvas_height'});
 #导出参数
@@ -268,9 +270,30 @@ $yimg->Opaque(color => 'black', fill => $ebc, invert => 'false'); #黑色替换�
 #添加整体模糊、油墨效果
 $yimg->AdaptiveBlur(radius => $ebr, sigma => $ebs) if($ebr and $ebs);
 $yimg->OilPaint(radius => $eop) if($eop);
-#测试图层扩展添加效果预览图
+#宣纸背景的效果预览图层
+my $pimg = $yimg->Clone();
+$pimg->Transparent($ebc);
+my $paper = Image::Magick->new();
+$paper->ReadImage('images/paper.jpg');
+$paper->Crop(width => $cw, height => $ch, x => rand(100), y => rand(100));
+$paper->Composite(image => $pimg, x => 0, y => 0);
+#Logo图层
+my $limg = Image::Magick->new();
+$limg->ReadImage('images/logo.png');
+my ($lw, $lh) = ($limg->Get('width'), $limg->Get('height'));
+my ($nlw, $nlh) = ($ts*$gr, $lh*$ts*$gr/$lw);
+$limg->AdaptiveResize(width => $nlw, height => $nlh, method => 'Lanczos');
+#测试图层横向扩展
 $timg->Extent(width => $cw*2+$ts, height => $ch, x => 0, y => 0, background => 'white');
-$timg->Composite(image => $yimg, x => $cw+$ts, y => 0, compose => 'Over');
+#宣纸背景效果预览图、Logo图层合并到测试图层扩展区域
+$timg->Composite(image => $paper, x => $cw+$ts, y => 0, compose => 'Over');
+$timg->Composite(image => $limg, x => $cw+$ts/2-$nlw/2, y => $ch-$nlh-$ts/2, compose => 'Over');
+#测试预览区
+my $timestamp = strftime('%Y/%m/%d %H:%M:%S', localtime);
+$timg->Annotate(text => '/Preview', font => 'Courier', pointsize => $ts/2, x => $cw+$ts*3/2, y => $ts*2/3,
+	fill => $ycolor, stroke => $ycolor, strokewidth => 1, decorate => 'underline');
+$timg->Annotate(text => "$software$version,$timestamp", font => 'Courier', pointsize => $ts/3,
+	x => $cw*2-$ts*5, y => $ch-$ts/2, fill => $ycolor, decorate => 'underline');
 $timg->Write("test/$yinfn.jpg");
 
 #导出操作
